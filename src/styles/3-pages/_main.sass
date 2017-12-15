@@ -1,0 +1,81 @@
+//-----Main-----//
+
+// font-family: 'Lobster', cursive;
+// font-family: 'Megrim', cursive;
+
+body, html,
+    background: #111 url('../images/background.png') top center
+    font-size: 10px
+    font-family: sans-serif
+    @media(max-width: 768px)
+        background-size: cover
+
+.content
+    margin: 0 auto
+    max-width: 960px
+    text-align: center
+
+header
+    .content
+        .logo
+            height: 480px
+            background: url(../images/screens_and_rocket.png) no-repeat center center
+            background-size: contain
+            margin-bottom: -40px
+            @media(max-width: 768px)
+                background-size: cover
+        p 
+            color: #E4EAF6
+            font-family: 'Lobster', cursive
+            font-size: 3.2rem
+            margin: 16px
+        h1 
+            color: #E4EAF6
+            font-family: 'Megrim', cursive
+            font-size: 6.4rem
+            margin: 16px
+
+main 
+    .content
+        display: flex
+        align-items: center
+        flex-direction: column
+        .about
+            max-width: 640px
+            margin: 0 20px
+            &:nth-child(2)
+                max-width: 540px
+            &:nth-child(3)
+                max-width: 440px
+            h2 
+                color: #FF6464
+                font-size: 3.2rem
+                font-family: 'Lobster', cursive
+            p 
+                color: #E4EAF6
+                font-size: 1.4rem
+                span 
+                    color: #D2555A
+                    font-style: it
+    .start-game
+        display: block
+        width: 320px
+        height: 50px
+        line-height: 50px
+        text-transform: uppercase
+        text-decoration: none
+        font-size: 3.2rem
+        font-family: 'Megrim', cursive
+        font-weight: bold
+        border-radius: 3px
+        color: #111
+        background-color: #FFE164
+        margin: 50px 0
+        transition: 0.3s
+        box-shadow: 0 0 15px 0 #D2555A
+        &:hover
+            background-color: #D2555A
+
+footer
+    text-align: center
+    padding: 10px

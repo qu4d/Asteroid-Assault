@@ -1,0 +1,65 @@
+//-----Mixins-----//
+//-----Clearfix-----//
+=clr
+    &::after
+        content: ""
+        display: table
+        clear: both
+
+//-----Make grid-----//
+=make-grid
+    padding: 0 $gutter / 2
+    float: left
+
+=make-grid-xs
+    @for $i from 1 through $columns
+        .col-xs-#{$i}
+            width: percentage($i / $columns)
+            +make-grid
+
+=make-grid-sm
+    @for $i from 1 through $columns
+        .col-sm-#{$i}
+            width: percentage($i / $columns)
+            +make-grid
+
+=make-grid-md
+    @for $i from 1 through $columns
+        .col-md-#{$i}
+            width: percentage($i / $columns)
+            +make-grid
+
+=make-grid-lg
+    @for $i from 1 through $columns
+        .col-lg-#{$i}
+            width: percentage($i / $columns)
+            +make-grid
+
+//-----Make grid offset-----//
+=make-grid-offset
+    padding: 0 $gutter / 2
+    float: left
+
+=make-grid-xs-offset
+    @for $i from 1 through $columns
+        .col-xs-offset-#{$i}
+            margin-left: percentage($i / $columns)
+            +make-grid-offset
+
+=make-grid-sm-offset
+    @for $i from 1 through $columns
+        .col-sm-offset-#{$i}
+            margin-left: percentage($i / $columns)
+            +make-grid-offset
+
+=make-grid-md-offset
+    @for $i from 1 through $columns
+        .col-md-offset-#{$i}
+            margin-left: percentage($i / $columns)
+            +make-grid-offset
+
+=make-grid-lg-offset
+    @for $i from 1 through $columns
+        .col-lg-offset-#{$i}
+            margin-left: percentage($i / $columns)
+            +make-grid-offset
