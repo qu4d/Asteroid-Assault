@@ -1,6 +1,4 @@
-'use strict';
-
-var backgroundImage,
+let backgroundImage,
     
     backgroundSound,
     gameOverSound,
@@ -9,7 +7,7 @@ var backgroundImage,
 
     ship,
     asteroids = [],
-    lasers = [],
+    lasers,
     sticks,
     
     difficulty = 5,
@@ -46,7 +44,7 @@ var backgroundImage,
 
         handleEvent: function (char, code, press) {
             if (this.listeners[code] != undefined) {
-                for (var i = 0; i < this.listeners[code].length; i++) {
+                for (let i = 0; i < this.listeners[code].length; i++) {
                     this.listeners[code][i](char, code, press);
                 }
             }
@@ -57,15 +55,14 @@ function preload() {
     backgroundSound = loadSound('dist/sounds/main_theme.mp3');
     backgroundSound.setVolume(0.7);
 
-    gameOverSound = loadSound('dist/sounds/game_over.mp3');
+    gameOverSound = loadSound('dist/sounds/game_over.wav');
     gameOverSound.setVolume(0.4);
 
     laserSound = loadSound('dist/sounds/pew.mp3');
-    laserSound.setVolume(0.2);
 
-    for (var i = 0; i < 3; i++){
+    for (let i = 0; i < 3; i++){
         explosionSoundEffects[i] = loadSound('dist/sounds/explosion_'+i+'.mp3');
-        explosionSoundEffects[i].setVolume(0.6);
+        explosionSoundEffects[i].setVolume(0.3);
     }
 }
 
@@ -76,7 +73,9 @@ function setupReload() {
     ship.speed = createVector(0, 0);
     ship.isBoosting = false;
 
-    for (var i = 0; i < difficulty; i++) {
+    lasers = [];
+
+    for (let i = 0; i < difficulty; i++) {
         asteroids.push(new Asteroid());
     }
 }
@@ -104,7 +103,7 @@ function draw() {
         setupReload();
     }
 
-    for (var i = 0; i < asteroids.length; i++) {
+    for (let i = 0; i < asteroids.length; i++) {
         if (ship.hits(asteroids[i])) {
             healthPoints -= 1;
             hud.update();
@@ -129,21 +128,21 @@ function draw() {
         backgroundSound.play();
     }
 
-    for (var i = lasers.length - 1; i >= 0; i--) {
+    for (let i = lasers.length - 1; i >= 0; i--) {
         lasers[i].render();
         lasers[i].update();
 
         if (lasers[i].offscreen()) {
             lasers.splice(i, 1);
         } else {
-            for (var j = asteroids.length - 1; j >= 0; j--) {
+            for (let j = asteroids.length - 1; j >= 0; j--) {
                 if (lasers[i].hits(asteroids[j])) {
                     asteroids[j].playSoundEffect(explosionSoundEffects);
                     scorePoints += 100;
                     hud.update();
 
                     if (asteroids[j].size > 15) {
-                        var newAsteroids = asteroids[j].breakup();
+                        let newAsteroids = asteroids[j].breakup();
                         asteroids = asteroids.concat(newAsteroids);
                     }
 
@@ -203,39 +202,41 @@ function mouseReleased() {
     sticks.released();
 }
 
-function Ship() {
-    this.position = createVector(width / 2, height / 2);
-    this.size = 20;
-    this.head = 0;
-    this.rotation = 0;
-    this.speed = createVector(0, 0);
-    this.isBoosting = false;
+class Ship {
+    constructor() {
+        this.position = createVector(width / 2, height / 2);
+        this.size = 20;
+        this.head = 0;
+        this.rotation = 0;
+        this.speed = createVector(0, 0);
+        this.isBoosting = false;
 
-    var scope = this;
+        let scope = this;
 
-    input.registerAsListener(32, function (char, code, press) {
-        if (!press) {
-            return;
-        }
+        input.registerAsListener(32, function (char, code, press) {
+            if (!press) {
+                return;
+            }
 
-        lasers.push(new Laser(ship.position, ship.head));
-        laserSound.play();
-    });
-    input.registerAsListener(RIGHT_ARROW, function (char, code, press) {
-        scope.setRotation(press ? 0.1 : 0);
-    });
-    input.registerAsListener(LEFT_ARROW, function (char, code, press) {
-        scope.setRotation(press ? -0.1 : 0);
-    });
-    input.registerAsListener(UP_ARROW, function (char, code, press) {
-        scope.boosting(press ? true : false);
-    });
+            lasers.push(new Laser(ship.position, ship.head));
+            laserSound.play();
+        });
+        input.registerAsListener(RIGHT_ARROW, function (char, code, press) {
+            scope.setRotation(press ? 0.1 : 0);
+        });
+        input.registerAsListener(LEFT_ARROW, function (char, code, press) {
+            scope.setRotation(press ? -0.1 : 0);
+        });
+        input.registerAsListener(UP_ARROW, function (char, code, press) {
+            scope.boosting(press ? true : false);
+        });
+    }
 
-    this.boosting = function (b) {
+    boosting(b) {
         this.isBoosting = b;
     }
 
-    this.update = function () {
+    update() {
         if (this.isBoosting) {
             this.boost();
         }
@@ -244,14 +245,14 @@ function Ship() {
         this.speed.mult(0.99);
     }
 
-    this.boost = function () {
-        var power = p5.Vector.fromAngle(this.head);
+    boost() {
+        let power = p5.Vector.fromAngle(this.head);
         power.mult(0.10);
 
         this.speed.add(power);
     }
 
-    this.render = function () {
+    render() {
         push();
         translate(this.position.x, this.position.y);
         rotate(this.head + PI / 2);
@@ -266,7 +267,7 @@ function Ship() {
         pop();
     }
 
-    this.edges = function () {
+    edges() {
         if (this.position.x > width + this.size) {
             this.position.x = -this.size;
         } else if (this.position.x < -this.size) {
@@ -280,16 +281,16 @@ function Ship() {
         }
     }
 
-    this.setRotation = function (angle) {
+    setRotation(angle) {
         this.rotation = angle;
     }
 
-    this.turn = function () {
+    turn() {
         this.head += this.rotation;
     }
 
-    this.hits = function (asteroid) {
-        var distance = dist(this.position.x, this.position.y, asteroid.position.x, asteroid.position.y);
+    hits(asteroid) {
+        let distance = dist(this.position.x, this.position.y, asteroid.position.x, asteroid.position.y);
 
         if (distance < this.size + asteroid.size) {
             return true;
@@ -299,49 +300,51 @@ function Ship() {
     }
 }
 
-function Asteroid(position, size) {
-    if (position) {
-        this.position = position.copy();
-    } else {
-        this.position = createVector(random(width), random(height));
+class Asteroid {
+    constructor(position, size) {
+        if (position) {
+            this.position = position.copy();
+        } else {
+            this.position = createVector(random(width), random(height));
+        }
+    
+        if (size) {
+            this.size = size * 0.5;
+        } else {
+            this.size = random(15, 50);
+        }
+    
+        this.speed = p5.Vector.random2D();
+        this.sides = floor(random(5, 15));
+        this.offset = [];
+    
+        for (let i = 0; i < this.sides; i++) {
+            this.offset[i] = random(-this.size * 0.2, this.size * 0.2);
+        }
     }
 
-    if (size) {
-        this.size = size * 0.5;
-    } else {
-        this.size = random(15, 50);
-    }
-
-    this.speed = p5.Vector.random2D();
-    this.sides = floor(random(5, 15));
-    this.offset = [];
-
-    for (var i = 0; i < this.sides; i++) {
-        this.offset[i] = random(-this.size * 0.2, this.size * 0.2);
-    }
-
-    this.render = function () {
+    render() {
         push();
         translate(this.position.x, this.position.y);
         fill(10);
         stroke(255);
 
         beginShape();
-        for (var i = 0; i < this.sides; i++) {
-            var angle = map(i, 0, this.sides, 0, TWO_PI);
-            var x = (this.size + this.offset[i]) * cos(angle);
-            var y = (this.size + this.offset[i]) * sin(angle);
+        for (let i = 0; i < this.sides; i++) {
+            let angle = map(i, 0, this.sides, 0, TWO_PI);
+            let x = (this.size + this.offset[i]) * cos(angle);
+            let y = (this.size + this.offset[i]) * sin(angle);
             vertex(x, y);
         }
         endShape(CLOSE);
         pop();
     }
 
-    this.update = function () {
+    update() {
         this.position.add(this.speed);
     }
 
-    this.edges = function () {
+    edges() {
         if (this.position.x > width + this.size) {
             this.position.x = -this.size;
         } else if (this.position.x < -this.size) {
@@ -355,31 +358,33 @@ function Asteroid(position, size) {
         }
     }
 
-    this.breakup = function () {
-        var newA = [];
+    breakup() {
+        let newA = [];
         newA[0] = new Asteroid(this.position, this.size);
         newA[1] = new Asteroid(this.position, this.size);
 
         return newA;
     }
 
-    this.playSoundEffect = function(soundArray) {
-        var currentSound = soundArray[floor(random(0, soundArray.length))];
+    playSoundEffect(soundArray) {
+        let currentSound = soundArray[floor(random(0, soundArray.length))];
         currentSound.play();
     }
 }
 
-function Laser(startingPosition, angle) {
-    this.position = createVector(startingPosition.x, startingPosition.y);
-    this.speed = p5.Vector.fromAngle(angle);
-    this.speed.mult(8);
-    this.color = colors[floor(random(0, colors.length - 1))];
+class Laser {
+    constructor(startingPosition, angle) {
+        this.position = createVector(startingPosition.x, startingPosition.y);
+        this.speed = p5.Vector.fromAngle(angle);
+        this.speed.mult(8);
+        this.color = colors[floor(random(0, colors.length - 1))];
+    }
 
-    this.update = function () {
+    update() {
         this.position.add(this.speed);
     }
 
-    this.render = function () {
+    render() {
         push();
         stroke(this.color[0], this.color[1], this.color[2]);
         strokeWeight(5);
@@ -387,8 +392,8 @@ function Laser(startingPosition, angle) {
         pop();
     }
 
-    this.hits = function (asteroid) {
-        var d = dist(this.position.x, this.position.y, asteroid.position.x, asteroid.position.y);
+    hits(asteroid) {
+        let d = dist(this.position.x, this.position.y, asteroid.position.x, asteroid.position.y);
 
         if (d < asteroid.size) {
             return true;
@@ -397,7 +402,7 @@ function Laser(startingPosition, angle) {
         }
     }
 
-    this.offscreen = function () {
+    offscreen() {
         if (this.position.x > width || this.position.x < 0) {
             return true;
         }
@@ -410,8 +415,10 @@ function Laser(startingPosition, angle) {
     }
 }
 
-function Hud() {
-    this.render = function() {
+class Hud {
+    constructor() {}
+
+    render() {
         textSize(32);
         fill(255);
         text(scorePoints, 0, 62);
@@ -428,7 +435,7 @@ function Hud() {
         pop();
     }
 
-    this.update = function() {
+    update() {
         textSize(32);
         fill(255);
         text(scorePoints, 0, 62);
@@ -440,8 +447,10 @@ function Hud() {
     }
 }
 
-function Sticks() {
-    this.render = function() {
+class Sticks {
+    constructor() {}
+
+    render() {
         push();
         noFill();
         colorMode(RGB, 255, 255, 255, 1);
@@ -459,8 +468,8 @@ function Sticks() {
         pop();
     }
 
-    this.pressed = function() {
-        var distanceFromStickLeft = dist(mouseX, mouseY, 80, height-80),
+    pressed() {
+        let distanceFromStickLeft = dist(mouseX, mouseY, 80, height-80),
             distanceFromStickRight = dist(mouseX, mouseY, width-80, height-80);
 
         if (distanceFromStickLeft < 50) {
@@ -475,7 +484,7 @@ function Sticks() {
         }
     }
 
-    this.released = function() {
+    released() {
         ship.setRotation(0);
     }
 }
